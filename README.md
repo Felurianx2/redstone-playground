@@ -7,6 +7,8 @@
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![RedStone](https://img.shields.io/badge/RedStone-FF3333?logo=redstone&logoColor=white)](https://redstone.finance/)
 
+> Demo: https://redstone-playground.vercel.app/
+
 ## 📖 Overview
 
 RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Pull & Push Model oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
