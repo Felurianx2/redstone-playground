@@ -1,0 +1,5 @@
+{
+  "name": "RedStone Oracle Playground",
+  "description": "An interactive testing environment to simulate and visualize the behavior of the RedStone Pull Model oracle under various conditions. Select data feeds, apply adverse scenarios, and inspect the resulting data packages and transaction details.",
+  "requestFramePermissions": []
+}
