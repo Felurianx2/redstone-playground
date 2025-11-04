@@ -11,7 +11,7 @@
 
 ## 📖 Overview
 
-RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Pull & Push Model oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
+RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Models oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
 
 - 🧪 **Test oracle behavior** under different scenarios
 - 🌐 **Fetch real-time data** from RedStone's decentralized network
