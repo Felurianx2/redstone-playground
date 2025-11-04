@@ -471,28 +471,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS** for the beautiful UI components
 - The Ethereum developer community for feedback and inspiration
 
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/Felurianx2/redstone-oracle-playground/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Felurianx2/redstone-oracle-playground/discussions)
-- **Twitter**: [@isasuarezx2](https://twitter.com/isasuarezx2)
-
 ## 🌟 Star History
 
 If you find this project helpful, please consider giving it a star ⭐
 
 ---
 
-**Built with ❤️ for the Web3 developer community**
-
 <div align="center">
+
+**Built with ❤️ for the Web3 developer community**
 
 **Isamar Suarez 🦈**
 
 [![Twitter](https://img.shields.io/twitter/follow/isasuarezx2?style=social)](https://twitter.com/isasuarezx2)
 [![GitHub](https://img.shields.io/github/followers/Felurianx2?style=social)](https://github.com/Felurianx2)
 
-</div>
-
-
 *Last updated: November 2025*
+</div>
