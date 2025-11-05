@@ -93,7 +93,7 @@ export default function App() {
 
           const requestConfig = {
             dataServiceId: "redstone-primary-prod",
-            uniqueSignersCount: 2,
+            uniqueSignersCount: 3, // Recommended for production (2-5 is typical)
             dataPackagesIds: [selectedFeed], // Make sure this is the correct feed
             authorizedSigners: authorizedSigners,
             urls: ["https://oracle-gateway-1.a.redstone.finance"],
