@@ -288,17 +288,43 @@ const presets: Record<string, ScenarioParams> = {
 
 ### RedStone Configuration
 
+### RedStone Configuration
+
 Adjust data fetching in `App.tsx`:
 
 ```typescript
 const response = await requestDataPackages({
   dataServiceId: "redstone-primary-prod",  // Production data service
-  uniqueSignersCount: 2,                   // Minimum signers required
+  uniqueSignersCount: 3,                   // Number of signers (2-5 recommended)
   dataPackagesIds: [selectedFeed],         // Feed IDs to fetch
   authorizedSigners: authorizedSigners,    // Authorized signer addresses
   urls: ["https://oracle-gateway-1.a.redstone.finance"], // Gateway URLs
 });
 ```
+
+**Understanding `uniqueSignersCount`:**
+
+This parameter controls the security vs cost trade-off:
+
+| Signers | Gas Cost | Security | Use Case |
+|---------|----------|----------|----------|
+| 1 | ~50k | ⚠️ Low | ❌ Never in production |
+| 2 | ~65k | ⚡ Minimal | Development/Testnet |
+| 3 | ~80k | ✅ Good | **Recommended for most dApps** |
+| 5 | ~110k | 🛡️ High | Critical DeFi protocols |
+| 10+ | ~200k+ | 🏰 Maximum | Special cases only |
+
+**Why more signers cost more gas:**
+- Each signer provides data that must be processed on-chain
+- More data = more calldata = more gas fees
+- However, more signers = better protection against corrupt/malicious data
+
+**Median calculation resilience:**
+- With 3 signers: 1 corrupt signer won't affect the median
+- With 2 signers: 1 corrupt signer corrupts 50% of the data
+- With 5 signers: 2 corrupt signers still filtered out by median
+
+**Our recommendation:** Use 3 signers as the minimum for production. It offers the best balance between security and cost.
 
 ## 🧪 Testing
 
