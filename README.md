@@ -1,70 +1,102 @@
 # RedStone Oracle Playground
 
-> Interactive testing environment for the RedStone Pull Model - Test oracle integrations with real-time data feeds
+> Interactive testing environment for RedStone oracles - Learn, test, and deploy oracle integrations with confidence
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![RedStone](https://img.shields.io/badge/RedStone-FF3333?logo=redstone&logoColor=white)](https://redstone.finance/)
 
+---
+
 ## 📖 Overview
 
-RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Pull Model oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
+**RedStone Oracle Playground** is an interactive, educational platform that bridges the gap between complex oracle documentation and practical developer understanding. Built for the RedStone Finance ecosystem, it transforms oracle integration from a daunting technical challenge into an intuitive, visual learning experience.
 
-- 🧪 **Test oracle behavior** under different scenarios
-- 🌐 **Fetch real-time data** from RedStone's decentralized network
-- 🎓 **Learn best practices** for oracle integration
-- 💻 **Generate Solidity code** for your contracts
-- 🔍 **Debug data packages** with visual inspection tools
+### 🎯 Mission
 
-## ✨ Features
+Make blockchain oracles accessible to everyone - from curious beginners to experienced developers - through hands-on experimentation, real-time feedback, and consequence-aware learning.
 
-### 🎯 Core Functionality
+---
 
-- **Real-Time Price Feeds**: Fetch live data for ETH, BTC, SOL and more from RedStone's oracle network
-- **Mock Data Simulation**: Test without API calls using realistic mock data
-- **Interactive Code Editor**: Edit and customize Solidity contracts with Monaco Editor (VSCode-like experience)
-- **Visual Debugging**: Inspect data packages, signatures, timestamps, and median calculations
-- **Educational Info Cards**: Context-aware explanations for each scenario
-- **Beginner Mode**: Toggle detailed explanations, tooltips, and step-by-step guidance for newcomers
-- **Smart Tooltips**: Inline help system with hover and click tooltips throughout the interface
+## ✨ Key Features
 
-### 🎮 Scenario Testing
+### 🎓 **Beginner-Friendly Learning**
 
-Test your oracle integration under 5 different scenarios:
+- **Beginner Mode Toggle**: Progressive disclosure system that shows/hides detailed explanations
+- **Smart Tooltips**: Contextual help on hover and click throughout the entire interface
+- **Educational Info Cards**: Learn not just *what* happens, but *why it matters* and *how to protect yourself*
+- **Quick Start Guide**: Step-by-step onboarding for complete beginners
+- **Plain Language**: Complex concepts explained without jargon
 
-| Scenario | Description | Use Case |
-|----------|-------------|----------|
-| **Normal Operation** | Standard oracle behavior with reliable data | Baseline testing |
-| **Price Spike** | Simulates 15% sudden price increase | Test circuit breakers and slippage protection |
-| **Delayed Feed** | 30-second old data timestamps | Validate timestamp freshness checks |
-| **Corrupt Signer** | Malicious oracle node providing bad data | Test median aggregation resilience |
-| **Outlier Injection** | Extreme outlier values | Verify data validation logic |
+### 🧪 **Interactive Testing**
 
-### 🛠️ Technical Features
+Test oracle behavior under real-world conditions:
 
-- **RedStone SDK Integration**: Official SDK for production-ready oracle data
-- **TypeScript**: Full type safety throughout the codebase
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Real-time Updates**: Live data fetching with configurable parameters
-- **Custom Scenarios**: Adjust parameters manually for advanced testing
-- **Beginner-Friendly UI**: Progressive disclosure with toggleable expert features
-- **Inline Help System**: Contextual tooltips and explanations throughout
-- **Accessibility**: Keyboard navigation, ARIA labels, and screen reader support
+| Scenario | What It Tests | Real-World Risk |
+|----------|---------------|-----------------|
+| **✅ Normal Operation** | Standard oracle behavior | Baseline - everything working correctly |
+| **📈 Price Spike** | 15% sudden price increase | User liquidations, slippage, flash crashes |
+| **⏰ Delayed Feed** | 30-second stale timestamps | Trading at outdated prices, arbitrage exploitation |
+| **⚠️ Corrupt Signer** | 1 malicious oracle node | Price manipulation, system compromise |
+| **🎯 Outlier Injection** | Extreme price outliers | Flash crashes, cascading liquidations |
+
+### **Dual Data Sources**
+
+**🧪 Mock Data Mode:**
+- Simulated prices for fast learning
+- No API calls required
+- Perfect for understanding concepts
+- Instant response time
+
+**🌐 Real Data Mode:**
+- Live prices from RedStone's public API
+- 3 independent signers
+- Actual market conditions
+- Real timestamps and signatures
+
+### 💻 **Code Generation**
+
+- **Monaco Editor Integration**: VS Code-like editing experience
+- **Production-Ready Solidity**: Generated contracts include:
+  - Timestamp validation
+  - Price deviation limits
+  - Signer verification
+  - Comprehensive comments
+- **Copy & Deploy**: One-click copy for Remix, Hardhat, or Foundry
+
+### 🔍 **Visual Debugging**
+
+- **Data Points Table**: Inspect values from each oracle signer
+- **Median Calculation**: See how outliers are filtered
+- **Timestamp Analysis**: Data freshness indicators
+- **Transaction Simulation**: Gas estimates and contract addresses
+- **Signature Verification**: Cryptographic proof display
+
+### 🛡️ **Consequence-Aware Design**
+
+Every scenario includes:
+- **⚠️ What Could Go Wrong**: Real-world consequences and risks
+- **🛡️ How to Protect Yourself**: Actionable security recommendations
+- **💡 Why It Matters**: Educational context for each feature
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
-- Basic understanding of Solidity and oracles
-- (Optional) Wallet for on-chain testing
+```bash
+Node.js 18+ 
+npm or yarn
+Modern browser (Chrome, Firefox, Safari, Edge)
+```
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/redstone-oracle-playground.git
+# Clone repository
+git clone https://github.com/yourusername/redstone-oracle-playground.git
 cd redstone-oracle-playground
 
 # Install dependencies
@@ -74,30 +106,404 @@ npm install
 npm run dev
 ```
 
-The playground will be available at `http://localhost:3000`
+Open `http://localhost:5173` in your browser.
 
-### Building for Production
+### Production Build
 
 ```bash
-# Create optimized production build
 npm run build
-
-# Preview production build locally
 npm run preview
 ```
 
+---
+
 ## 📚 How to Use
 
-### 🎓 New to Oracles? Start Here!
+### 🎓 For Beginners
 
-1. **Enable Beginner Mode** (toggle in header)
-   - Shows detailed explanations for every feature
-   - Provides inline tooltips on technical terms
-   - Guides you step-by-step through the process
+1. **Enable Beginner Mode** (top left toggle)
+   - Activates detailed explanations
+   - Shows helpful tooltips everywhere
+   - Displays step-by-step guidance
 
-2. **Understand Data Sources** (click "What's the difference?" in header)
-   - Learn when to use Mock Data vs Real Data
-   - See practical examples and use cases
+2. **Understand Data Sources**
+   - Click "What's the difference?" in header
+   - Learn when to use Mock vs Real Data
+   - See practical examples
+
+3. **Run Your First Simulation**
+   - Select **Ethereum**
+   - Keep **Normal Operation** selected
+   - Click **"Run Simulation"**
+   - Explore the results!
+
+4. **Learn from Each Scenario**
+   - Try different scenarios
+   - Read "What could go wrong?"
+   - Apply "How to protect yourself" tips
+
+### 👨‍💻 For Experienced Developers
+
+1. **Test Edge Cases**
+   - Run all 5 scenarios with Real Data
+   - Validate your assumptions
+   - Identify potential vulnerabilities
+
+2. **Generate Production Code**
+   - Copy generated Solidity contracts
+   - Customize for your use case
+   - Deploy with confidence
+
+3. **Debug Oracle Integration**
+   - Inspect data packages
+   - Verify signatures
+   - Validate timestamp freshness
+
+---
+
+## 🎮 Interface Guide
+
+### Header Section
+
+```
+┌─────────────────────────────────────────────────┐
+│ [RedStone Logo] RedStone Oracle Playground      │
+│                                                 │
+│ [Push Model] [Pull Model] [Hybrid] [Architecture]│
+├─────────────────────────────────────────────────┤
+│ [Beginner Mode ?]    [What's the difference?]│
+│                          [🧪 Use Mock Data ?]   │
+└─────────────────────────────────────────────────┘
+```
+
+**Controls:**
+- **Beginner Mode**: Toggle explanations on/off
+- **Data Mode**: Switch between Mock and Real Data
+- **What's the difference?**: Compare data sources
+
+### Feed Selection
+
+Choose your cryptocurrency:
+- **Ethereum (ETH)**: Most popular for DeFi
+- **Bitcoin (BTC)**: Largest by market cap
+- **Solana (SOL)**: Fast, low-cost platform
+
+### Scenario Selection
+
+Pick a test scenario or use **Normal Operation** for baseline testing.
+
+### Results Panel
+
+After running simulation:
+- ✅ **Success Summary**: Key metrics at a glance
+- 📊 **Median Price**: Calculated from all signers
+- 📋 **Data Points Table**: Individual signer data
+- 🔍 **Transaction Details**: Simulated on-chain data
+- 📝 **What's Happening Card**: Educational context
+- 💻 **Generated Code**: Production-ready Solidity
+
+---
+
+## Architecture
+
+### Technology Stack
+
+```
+Frontend:
+├── React 18.3
+├── TypeScript 5.6
+├── Vite 5.4
+└── Tailwind CSS 3.4
+
+Oracle Integration:
+├── RedStone Public API
+└── Fetch API (native browser)
+
+Code Editor:
+└── Monaco Editor (VS Code engine)
+
+Deployment:
+└── Vercel (recommended)
+```
+
+### Project Structure
+
+```
+redstone-oracle-playground/
+├── src/
+│   ├── components/
+│   │   ├── Header_UX.tsx          # Main header with toggles
+│   │   ├── ConfigurationPanel_UX.tsx # Feed & scenario selection
+│   │   ├── ResultsPanel_UX.tsx    # Simulation results
+│   │   ├── InfoCard.tsx           # Educational context
+│   │   ├── CodeEditor.tsx         # Monaco editor
+│   │   └── Tooltip.tsx            # Reusable tooltip
+│   ├── types.ts                   # TypeScript definitions
+│   ├── constants.ts               # Feed configurations
+│   ├── App.tsx                    # Main application
+│   └── main.tsx                   # Entry point
+├── public/
+│   └── assets/
+│       └── logo.png               # RedStone logo
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
+```
+
+### Data Flow
+
+```
+User Action → Component State → API Call (if Real Data)
+     ↓                              ↓
+Scenario Params → Apply Modifications → Calculate Median
+     ↓                              ↓
+Generate Code ← Update UI ← Format Results
+```
+
+---
+
+## 🔧 Configuration
+
+### Supported Feeds
+
+Currently supported cryptocurrencies:
+
+```typescript
+const SUPPORTED_FEEDS = [
+  { id: "ETH", name: "Ethereum", symbol: "ETH", currentPrice: 3418.58 },
+  { id: "BTC", name: "Bitcoin", symbol: "BTC", currentPrice: 96842.50 },
+  { id: "SOL", name: "Solana", symbol: "SOL", currentPrice: 238.42 }
+];
+```
+
+### Scenario Parameters
+
+```typescript
+interface ScenarioParams {
+  priceShift: number;        // Percentage price change
+  timestampDelay: number;    // Seconds of delay
+  corruptSigners: number;    // Number of malicious signers
+  outlierValue: number;      // Outlier percentage
+}
+```
+
+### Data Freshness Criteria
+
+| Age | Status | Color |
+|-----|--------|-------|
+| < 1 min | Very Fresh | 🟢 Green |
+| 1-3 min | Fresh | 🔵 Blue |
+| 3-5 min | Acceptable | 🟡 Yellow |
+| > 5 min | Stale | 🔴 Red |
+
+---
+
+## 🧪 Testing
+
+### Manual Testing
+
+Use the comprehensive checklist:
+
+```bash
+# See TESTING_CHECKLIST.md for full testing guide
+./docs/TESTING_CHECKLIST.md
+```
+
+### Test Coverage
+
+60+ manual tests covering:
+- ✅ All UI components
+- ✅ Mock Data scenarios
+- ✅ Real Data integration
+- ✅ Error handling
+- ✅ Responsiveness
+- ✅ Cross-browser compatibility
+- ✅ Accessibility
+
+---
+
+## 📖 Educational Resources
+
+### In-App Learning
+
+- **Beginner Mode**: Toggle for progressive disclosure
+- **Tooltips**: Hover over (?) icons for explanations
+- **Info Cards**: Context-aware educational content
+- **Consequences**: "What could go wrong?" sections
+- **Protections**: "How to protect yourself" guides
+
+### External Resources
+
+- [RedStone Documentation](https://docs.redstone.finance/)
+- [RedStone Blog](https://blog.redstone.finance/)
+- [Solidity Docs](https://docs.soliditylang.org/)
+- [Remix IDE](https://remix.ethereum.org/)
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Q: Simulation fails with Real Data**
+```
+A: Check your internet connection. Try switching to Mock Data mode.
+   Verify the RedStone API is accessible from your network.
+```
+
+**Q: Data shows as "Stale"**
+```
+A: This is normal for public APIs. Data 1-3 minutes old is still reliable.
+   The playground shows freshness status for educational purposes.
+```
+
+**Q: Code editor not loading**
+```
+A: Ensure JavaScript is enabled. Clear browser cache.
+   Try a different browser (Chrome recommended).
+```
+
+**Q: Tooltips not appearing**
+```
+A: Enable Beginner Mode first. Some tooltips only appear in this mode.
+   Try clicking the (?) icons for click-based tooltips.
+```
+
+### Browser Support
+
+| Browser | Version | Status |
+|---------|---------|--------|
+| Chrome | 90+ | ✅ Fully Supported |
+| Firefox | 88+ | ✅ Fully Supported |
+| Safari | 14+ | ✅ Fully Supported |
+| Edge | 90+ | ✅ Fully Supported |
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Phase 1: MVP (Completed - v2.0.0)
+- [x] Real-time price feeds (ETH, BTC, SOL)
+- [x] Mock data simulation
+- [x] 5 scenario testing modes
+- [x] Interactive code editor
+- [x] Educational info cards
+- [x] Visual debugging tools
+- [x] Beginner Mode with progressive disclosure
+- [x] Smart tooltip system (hover + click)
+- [x] Consequence-aware scenario explanations
+- [x] Improved feedback and results display
+- [x] Data mode comparison (Mock vs Real)
+
+### 🔄 Phase 2: Enhanced Learning (Q1 2026)
+- [ ] Interactive tutorial (guided walkthrough)
+- [ ] 50+ price feeds
+- [ ] Historical data playback
+- [ ] Saved scenarios/workspaces
+- [ ] Contract testing framework integration
+- [ ] Multi-language support (i18n)
+- [ ] Video tutorials
+- [ ] Gamification (achievements, progress tracking)
+
+### 🚀 Phase 3: Advanced Features (Q2 2026)
+- [ ] Multi-oracle comparison (Chainlink, Pyth, etc.)
+- [ ] Custom feed creation
+- [ ] Advanced analytics dashboard
+- [ ] Team collaboration features
+- [ ] API access for automated testing
+- [ ] Hardhat/Foundry plugins
+- [ ] CI/CD integration
+- [ ] Multi-chain support (Arbitrum, Polygon, Base)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+
+```bash
+# Fork the repository
+# Create a feature branch
+git checkout -b feature/amazing-feature
+
+# Make your changes
+# Commit with conventional commits
+git commit -m "feat: add amazing feature"
+
+# Push to your fork
+git push origin feature/amazing-feature
+
+# Open a Pull Request
+```
+
+### Code Style
+
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Follow provided configuration
+- **Prettier**: Auto-formatting on save
+- **Components**: Functional components with hooks
+- **CSS**: Tailwind utility classes
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **RedStone Finance** - For the oracle infrastructure and API
+- **Monaco Editor** - For the excellent code editor
+- **Tailwind CSS** - For the utility-first CSS framework
+- **Vite** - For the blazing fast build tool
+- **React Team** - For the amazing framework
+
+---
+
+## 📞 Support & Community
+
+- **Documentation**: [docs.redstone.finance](https://docs.redstone.finance)
+- **Discord**: [discord.gg/redstone](https://discord.gg/redstone)
+- **Twitter**: [@redstone_defi](https://twitter.com/redstone_defi)
+- **GitHub Issues**: [Report bugs](https://github.com/yourusername/redstone-oracle-playground/issues)
+- **Email**: support@redstone.finance
+
+---
+
+## 🎬 Demo & Pitch
+
+**Video Pitch**: [Watch on YouTube](#)  
+**Live Demo**: [playground.redstone.finance](#)  
+**Pitch Deck**: [View Slides](#)
+
+---
+
+## 📊 Project Stats
+
+![GitHub stars](https://img.shields.io/github/stars/yourusername/redstone-oracle-playground?style=social)
+![GitHub forks](https://img.shields.io/github/forks/yourusername/redstone-oracle-playground?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/yourusername/redstone-oracle-playground?style=social)
+
+---
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/redstone-oracle-playground&type=Date)](https://star-history.com/#yourusername/redstone-oracle-playground&Date)
+
+---
+
+<div align="center">
+
+**Built for the RedStone Community**
+
+[Website](https://redstone.finance) • [Docs](https://docs.redstone.finance) • [Blog](https://blog.redstone.finance) • [Twitter](https://twitter.com/redstone_defi)
+
+</div>
 
 3. **Follow the Quick Start Guide** (appears when Beginner Mode is on)
    - Pick a cryptocurrency
@@ -107,9 +513,9 @@ npm run preview
 ### 1️⃣ Select a Price Feed
 
 Choose from available feeds:
-- **Ethereum (ETH)**: Most popular cryptocurrency for DeFi applications
-- **Bitcoin (BTC)**: First and largest cryptocurrency by market cap
-- **Solana (SOL)**: Fast, low-cost blockchain platform
+- **🟣 Ethereum (ETH)**: Most popular cryptocurrency for DeFi applications
+- **🟠 Bitcoin (BTC)**: First and largest cryptocurrency by market cap
+- **🟢 Solana (SOL)**: Fast, low-cost blockchain platform
 
 Each feed card includes:
 - Cryptocurrency icon and name
@@ -255,7 +661,7 @@ Click **"Run Simulation"** to execute the test.
 - Paste into Remix, Hardhat, or Foundry
 - Deploy and test on-chain
 
-## Architecture
+## 🏗️ Architecture
 
 ### Project Structure
 
@@ -407,7 +813,7 @@ This parameter controls the security vs cost trade-off:
 
 ## 🎨 User Experience Features
 
-### Beginner Mode 👶
+### Beginner Mode
 
 Toggle Beginner Mode in the header to unlock:
 
@@ -586,8 +992,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Monaco Editor** for the VSCode-like code editing experience
 - **Tailwind CSS** for the beautiful UI components
 - The Ethereum developer community for feedback and inspiration
-
----
 
 ## 🌟 Star History
 
