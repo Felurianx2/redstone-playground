@@ -1,17 +1,15 @@
 # RedStone Oracle Playground
 
-> Interactive testing environment for RedStone Oracle - Test oracle integrations with real-time data feeds
+> Interactive testing environment for the RedStone Pull Model - Test oracle integrations with real-time data feeds
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![RedStone](https://img.shields.io/badge/RedStone-FF3333?logo=redstone&logoColor=white)](https://redstone.finance/)
 
-> Demo: https://redstone-playground.vercel.app/
-
 ## 📖 Overview
 
-RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Models oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
+RedStone Oracle Playground is an educational tool designed for developers to understand, test, and experiment with RedStone's Pull Model oracle integration. Whether you're building DeFi protocols, NFT marketplaces, or any dApp requiring reliable price feeds, this playground helps you:
 
 - 🧪 **Test oracle behavior** under different scenarios
 - 🌐 **Fetch real-time data** from RedStone's decentralized network
@@ -28,6 +26,8 @@ RedStone Oracle Playground is an educational tool designed for developers to und
 - **Interactive Code Editor**: Edit and customize Solidity contracts with Monaco Editor (VSCode-like experience)
 - **Visual Debugging**: Inspect data packages, signatures, timestamps, and median calculations
 - **Educational Info Cards**: Context-aware explanations for each scenario
+- **Beginner Mode**: Toggle detailed explanations, tooltips, and step-by-step guidance for newcomers
+- **Smart Tooltips**: Inline help system with hover and click tooltips throughout the interface
 
 ### 🎮 Scenario Testing
 
@@ -48,6 +48,9 @@ Test your oracle integration under 5 different scenarios:
 - **Responsive Design**: Works on desktop, tablet, and mobile
 - **Real-time Updates**: Live data fetching with configurable parameters
 - **Custom Scenarios**: Adjust parameters manually for advanced testing
+- **Beginner-Friendly UI**: Progressive disclosure with toggleable expert features
+- **Inline Help System**: Contextual tooltips and explanations throughout
+- **Accessibility**: Keyboard navigation, ARIA labels, and screen reader support
 
 ## 🚀 Quick Start
 
@@ -85,14 +88,48 @@ npm run preview
 
 ## 📚 How to Use
 
+### 🎓 New to Oracles? Start Here!
+
+1. **Enable Beginner Mode** (toggle in header)
+   - Shows detailed explanations for every feature
+   - Provides inline tooltips on technical terms
+   - Guides you step-by-step through the process
+
+2. **Understand Data Sources** (click "What's the difference?" in header)
+   - Learn when to use Mock Data vs Real Data
+   - See practical examples and use cases
+
+3. **Follow the Quick Start Guide** (appears when Beginner Mode is on)
+   - Pick a cryptocurrency
+   - Run a simple simulation
+   - Learn what the results mean
+
 ### 1️⃣ Select a Price Feed
 
 Choose from available feeds:
-- **Ethereum (ETH)**: Real-time ETH/USD price
-- **Bitcoin (BTC)**: Real-time BTC/USD price
-- **Solana (SOL)**: Real-time SOL/USD price
+- **Ethereum (ETH)**: Most popular cryptocurrency for DeFi applications
+- **Bitcoin (BTC)**: First and largest cryptocurrency by market cap
+- **Solana (SOL)**: Fast, low-cost blockchain platform
+
+Each feed card includes:
+- Cryptocurrency icon and name
+- Brief description of the asset
+- In Beginner Mode: Extended educational context
+
+**Note:** Price values are shown only in simulation results, not during selection. This avoids confusion and lets you focus on learning oracle behavior rather than tracking live prices.
 
 ### 2️⃣ Choose Data Source
+
+**Beginner Mode Toggle** 👶
+
+Enable Beginner Mode in the header to see:
+- Detailed step-by-step explanations
+- Inline tooltips on every feature
+- "What could go wrong?" sections
+- "How to protect yourself" guidance
+- Quick start guides and learning tips
+
+Perfect for newcomers to oracles and smart contracts!
 
 **Mock Data Mode** (Default)
 - Uses realistic simulated data
@@ -102,9 +139,12 @@ Choose from available feeds:
 
 **Real Data Mode** (Toggle checkbox)
 - Fetches live data from RedStone's oracle network
-- Multiple signers (typically 2-5) provide price data
+- Multiple signers (typically 3-5) provide price data
 - Real signatures and timestamps
 - Median aggregation applied automatically
+
+**Understanding the difference:**
+Click "What's the difference?" in the header to see a detailed comparison between Mock Data and Real Data modes. This helps you understand when to use each mode and what benefits each provides.
 
 ### 3️⃣ Select a Scenario
 
@@ -188,7 +228,15 @@ Click **"Run Simulation"** to execute the test.
 - Scenario explanation
 - Educational context
 - "Why it matters" insights
+- **What could go wrong?** - Real-world consequences
+- **How to protect yourself** - Security best practices
 - Median calculation breakdown
+
+**In Beginner Mode:**
+- Additional tooltips on every data field
+- Glossary definitions (hover over ? icons)
+- Plain language explanations
+- Learning tips and next steps
 
 ### 6️⃣ Generate & Edit Contract
 
@@ -214,15 +262,16 @@ Click **"Run Simulation"** to execute the test.
 ```
 redstone-oracle-playground/
 ├── components/
-│   ├── Header.tsx              # App header with branding
-│   ├── ConfigurationPanel.tsx  # Feed selection & scenarios
-│   ├── ResultsPanel.tsx        # Simulation results display
-│   ├── CodeEditor.tsx          # Monaco-based code editor
-│   └── InfoCard.tsx            # Educational explanations
+│   ├── Header.tsx              # App header with branding & Beginner Mode toggle
+│   ├── ConfigurationPanel.tsx  # Feed selection & scenarios (UX improved)
+│   ├── ResultsPanel.tsx        # Simulation results with detailed feedback
+│   ├── CodeEditor.tsx          # Monaco-based code editor with beginner help
+│   ├── InfoCard.tsx            # Educational explanations with consequences
+│   └── Tooltip.tsx             # Reusable tooltip component (hover & click)
 ├── types.ts                     # TypeScript type definitions
 ├── constants.ts                 # Supported feeds configuration
 ├── scenarioDescriptions.ts      # Scenario metadata
-├── App.tsx                      # Main application logic
+├── App.tsx                      # Main application logic with beginnerMode state
 └── index.tsx                    # App entry point
 ```
 
@@ -285,8 +334,6 @@ const presets: Record<string, ScenarioParams> = {
   // Modify or add scenarios
 };
 ```
-
-### RedStone Configuration
 
 ### RedStone Configuration
 
@@ -357,6 +404,41 @@ This parameter controls the security vs cost trade-off:
 3. Select "Price Spike"
 4. Run → Should show SOL price + 15%
 ```
+
+## 🎨 User Experience Features
+
+### Beginner Mode 👶
+
+Toggle Beginner Mode in the header to unlock:
+
+- **Step-by-step guidance**: Clear instructions for every action
+- **Inline tooltips**: Hover over ? icons to learn technical terms
+- **Extended explanations**: Understand not just what happens, but why it matters
+- **Quick start guide**: Get up and running in minutes
+- **Learning tips**: Context-aware suggestions throughout your journey
+- **Plain language**: Technical concepts explained without jargon
+
+### Smart Help System
+
+- **Hover tooltips**: For terms with enough space
+- **Click tooltips (?)**: For compact areas like table headers
+- **Info panels**: Expandable sections with detailed explanations
+- **Data mode comparison**: Understand Mock vs Real Data at a glance
+
+### Consequence-Aware Learning
+
+Every scenario now includes:
+- **What could go wrong?** Real-world risks and consequences
+- **How to protect yourself?** Practical security best practices
+- **Why it matters** Educational context for each feature
+
+### Improved Feedback
+
+After running simulations, see:
+- **Results summary**: Clear success/failure indicators
+- **Data freshness**: Visual indication of how recent the data is
+- **What this means**: Plain language explanation of results
+- **Next steps**: Suggestions for what to try next
 
 ## 🐛 Troubleshooting
 
@@ -447,20 +529,26 @@ contract MyDeFiProtocol is MainDemoConsumerBase {
 
 ## 🗺️ Roadmap
 
-### Phase 1: MVP ✅ (Current)
+### Phase 1: MVP ✅ (Completed)
 - [x] Real-time price feeds (ETH, BTC, SOL)
 - [x] Mock data simulation
 - [x] 5 scenario testing modes
 - [x] Interactive code editor
 - [x] Educational info cards
 - [x] Visual debugging tools
+- [x] **Beginner Mode with progressive disclosure**
+- [x] **Smart tooltip system (hover + click)**
+- [x] **Consequence-aware scenario explanations**
+- [x] **Improved feedback and results display**
+- [x] **Data mode comparison (Mock vs Real)**
 
-### Phase 2: Enhanced Learning 🔄 (Next)
-- [ ] Interactive tutorial (step-by-step guide)
+### Phase 2: Enhanced Learning 🔄 (In Progress)
+- [ ] Interactive tutorial (step-by-step guided walkthrough)
 - [ ] More price feeds (50+ assets)
 - [ ] Historical data playback
 - [ ] Saved scenarios/workspaces
 - [ ] Contract testing framework integration
+- [ ] Multi-language support (i18n)
 
 ### Phase 3: Advanced Features 🔮 (Future)
 - [ ] Multi-chain support (Ethereum, Arbitrum, Base, etc.)
@@ -499,6 +587,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS** for the beautiful UI components
 - The Ethereum developer community for feedback and inspiration
 
+---
+
 ## 🌟 Star History
 
 If you find this project helpful, please consider giving it a star ⭐
@@ -507,7 +597,7 @@ If you find this project helpful, please consider giving it a star ⭐
 
 <div align="center">
 
-**Built with ❤️ for the Web3 developer community**
+**Built for the Web3 developer community**
 
 **Isamar Suarez 🦈**
 

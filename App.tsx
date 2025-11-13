@@ -1,363 +1,317 @@
-import React, { useState, useEffect, useCallback } from "react";
-import type { DebugData, ScenarioParams, SimulationState } from "./types";
+import { useState } from "react";
+import Header from "./components/Header_UX";
+import ConfigurationPanel from "./components/ConfigurationPanel_UX";
+import ResultsPanel from "./components/ResultsPanel_UX";
+import type { SimulationState, DebugData, ScenarioParams, Feed } from "./types";
 import { SUPPORTED_FEEDS } from "./constants";
-import ConfigurationPanel from "./components/ConfigurationPanel";
-import ResultsPanel from "./components/ResultsPanel";
-import Header from "./components/Header";
 import { requestDataPackages, getSignersForDataServiceId } from "@redstone-finance/sdk";
 
-const Footer: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <footer className="w-full py-4 bg-black/20 border-t border-gray-700/50 mt-auto">
-      <div className="max-w-7xl mx-auto flex justify-between items-center text-sm text-gray-400 px-4 sm:px-6 lg:px-8">
-        <span className="font-mono">v1.0.0 - MVP</span>
-        <span className="font-mono">
-          {currentTime.toLocaleString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}
-        </span>
-        <a
-          href="https://redstone.finance"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-[#FF3333] hover:text-red-400 transition-colors"
-        >
-          Powered by RedStone
-        </a>
-      </div>
-    </footer>
-  );
-};
-
-export default function App() {
-  const [selectedFeed, setSelectedFeed] = useState("ETH");
-  const [selectedScenario, setSelectedScenario] = useState("normal");
-  const [useRealData, setUseRealData] = useState(false);
-
+function App() {
+  // State Management
+  const [selectedFeed, setSelectedFeed] = useState<string>("ETH");
+  const [selectedScenario, setSelectedScenario] = useState<string>("normal");
   const [scenarioParams, setScenarioParams] = useState<ScenarioParams>({
     priceShift: 0,
     timestampDelay: 0,
     corruptSigners: 0,
     outlierValue: 0,
   });
-
   const [simulationState, setSimulationState] = useState<SimulationState>("idle");
   const [debugData, setDebugData] = useState<DebugData | null>(null);
-  const [contractAddress, setContractAddress] = useState("");
+  const [useRealData, setUseRealData] = useState(false);
+  const [beginnerMode, setBeginnerMode] = useState(false);
 
-  const currentFeed =
-    SUPPORTED_FEEDS.find((feed) => feed.id === selectedFeed) || SUPPORTED_FEEDS[0];
+  // Scenario Presets
+  const presets: Record<string, ScenarioParams> = {
+    normal: { priceShift: 0, timestampDelay: 0, corruptSigners: 0, outlierValue: 0 },
+    price_spike: { priceShift: 15, timestampDelay: 0, corruptSigners: 0, outlierValue: 0 },
+    delayed_feed: { priceShift: 0, timestampDelay: 30, corruptSigners: 0, outlierValue: 0 },
+    corrupt_signer: { priceShift: 0, timestampDelay: 0, corruptSigners: 1, outlierValue: 0 },
+    outlier_injection: { priceShift: 0, timestampDelay: 0, corruptSigners: 0, outlierValue: 50 },
+  };
 
-  useEffect(() => {
-    const presets: Record<string, ScenarioParams> = {
-      price_spike: { priceShift: 15, timestampDelay: 0, corruptSigners: 0, outlierValue: 0 },
-      delayed_feed: { priceShift: 0, timestampDelay: 30, corruptSigners: 0, outlierValue: 0 },
-      corrupt_signer: { priceShift: 0, timestampDelay: 0, corruptSigners: 1, outlierValue: 0 },
-      outlier_injection: { priceShift: 0, timestampDelay: 0, corruptSigners: 0, outlierValue: 50 },
-      normal: { priceShift: 0, timestampDelay: 0, corruptSigners: 0, outlierValue: 0 },
-    };
-    setScenarioParams(presets[selectedScenario] || presets.normal);
-  }, [selectedScenario]);
+  // Apply preset when scenario changes
+  const handleScenarioChange = (scenario: string) => {
+    setSelectedScenario(scenario);
+    if (presets[scenario]) {
+      setScenarioParams(presets[scenario]);
+    }
+  };
 
-  const runSimulation = useCallback(async () => {
+  // Fetch Real Data from RedStone using HTTP Cache API
+  const fetchRealData = async () => {
+    try {
+      console.log(`🔍 Fetching real data for ${selectedFeed}...`);
+      
+      // Use RedStone public API endpoint
+      const apiUrl = `https://api.redstone.finance/prices?symbol=${selectedFeed}&provider=redstone&limit=3`;
+      
+      console.log("📡 Fetching from:", apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      console.log("📦 Raw response:", data);
+
+      if (!data || data.length === 0) {
+        throw new Error(`No data found for ${selectedFeed}`);
+      }
+
+      console.log(`✅ Got ${data.length} price data points`);
+
+      // Parse price data
+      const dataPoints = data.slice(0, 3).map((item: any, index: number) => {
+        const value = item.value || 0;
+        let timestamp = item.timestamp || Date.now();
+        
+        // Convert timestamp to milliseconds if it's in seconds
+        // Timestamps in seconds are typically < 10^12, milliseconds are > 10^12
+        if (timestamp < 10000000000) {
+          timestamp = timestamp * 1000;
+        }
+        
+        console.log(`💰 Data point ${index + 1} - Price: $${value.toFixed(2)}, Timestamp: ${new Date(timestamp).toLocaleString()}`);
+
+        return {
+          id: `signer_${index + 1}`,
+          value: value,
+          timestamp: timestamp,
+        };
+      });
+
+      // Generate mock signatures for display purposes
+      const signatures = dataPoints.map((_, i) => 
+        `0x${Math.random().toString(16).slice(2, 66)}`
+      );
+
+      console.log("✅ Successfully parsed real data");
+
+      return { dataPoints, signatures };
+    } catch (error) {
+      console.error("❌ Error fetching real data:", error);
+      
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+      }
+      
+      throw error;
+    }
+  };
+
+  // Generate Mock Data
+  const generateMockData = () => {
+    const feed = SUPPORTED_FEEDS.find((f) => f.id === selectedFeed);
+    if (!feed) throw new Error("Feed not found");
+
+    const basePrice = feed.currentPrice;
+    const dataPoints = [
+      {
+        id: "signer_1",
+        value: basePrice * (1 + (Math.random() * 0.002 - 0.001)),
+        timestamp: Date.now(),
+      },
+      {
+        id: "signer_2",
+        value: basePrice * (1 + (Math.random() * 0.002 - 0.001)),
+        timestamp: Date.now(),
+      },
+      {
+        id: "signer_3",
+        value: basePrice * (1 + (Math.random() * 0.002 - 0.001)),
+        timestamp: Date.now(),
+      },
+    ];
+
+    const signatures = dataPoints.map((_, i) => `0x${Math.random().toString(16).slice(2, 66)}`);
+
+    return { dataPoints, signatures };
+  };
+
+  // Apply Scenario Modifications
+  const applyScenarioModifications = (dataPoints: any[], params: ScenarioParams) => {
+    const modified = [...dataPoints];
+
+    // Apply price shift
+    if (params.priceShift !== 0) {
+      const shiftFactor = 1 + params.priceShift / 100;
+      modified.forEach((point) => {
+        point.value *= shiftFactor;
+      });
+    }
+
+    // Apply timestamp delay
+    if (params.timestampDelay > 0) {
+      modified.forEach((point) => {
+        point.timestamp -= params.timestampDelay * 1000;
+      });
+    }
+
+    // Apply corrupt signers
+    if (params.corruptSigners > 0) {
+      for (let i = 0; i < Math.min(params.corruptSigners, modified.length); i++) {
+        modified[i].value *= 0.5; // Corrupt signer provides 50% of real value
+      }
+    }
+
+    // Apply outlier injection
+    if (params.outlierValue > 0) {
+      if (modified.length > 0) {
+        modified[0].value *= 1 + params.outlierValue / 100;
+      }
+    }
+
+    return modified;
+  };
+
+  // Calculate Median Price
+  const calculateMedian = (values: number[]): number => {
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+  };
+
+  // Run Simulation
+  const runSimulation = async () => {
     setSimulationState("running");
-    setDebugData(null);
-    setContractAddress("");
 
     try {
-      let debug: DebugData;
-
+      // Fetch data
+      let rawData;
       if (useRealData) {
-        // ✅ REAL DATA - RedStone Integration (OFFICIAL DOCUMENTATION METHOD)
-        try {
-          console.log("=== STARTING REAL DATA FETCH ===");
-          console.log("Selected Feed:", selectedFeed);
-          console.log("Current Feed Object:", currentFeed);
-          
-          // Get authorized signers for the data service
-          const authorizedSigners = getSignersForDataServiceId("redstone-primary-prod");
-          
-          console.log("Authorized Signers:", authorizedSigners);
-
-          const requestConfig = {
-            dataServiceId: "redstone-primary-prod",
-            uniqueSignersCount: 3, // Recommended for production (2-5 is typical)
-            dataPackagesIds: [selectedFeed], // Make sure this is the correct feed
-            authorizedSigners: authorizedSigners,
-            urls: ["https://oracle-gateway-1.a.redstone.finance"],
-          };
-          
-          console.log("Request Config:", requestConfig);
-
-          const response = await requestDataPackages(requestConfig);
-
-          console.log("=== RedStone Response ===");
-          console.log("Response:", response);
-          console.log("Full Response Structure:", JSON.stringify(response, (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value
-          , 2));
-          
-          const feedData = response[selectedFeed];
-          if (!feedData || !Array.isArray(feedData) || feedData.length === 0) {
-            throw new Error(`Feed ${selectedFeed} not found or empty in response`);
-          }
-
-          console.log("Feed Data:", feedData);
-
-          // Process all signed packages (multiple signers)
-          const processedDataPoints = feedData.map((signedPackage: any, idx: number) => {
-            if (!signedPackage || !signedPackage.dataPackage) {
-              console.warn(`Invalid signed package at index ${idx}`);
-              return null;
-            }
-
-            const dataPackage = signedPackage.dataPackage;
-            const dataPoints = dataPackage.dataPoints;
-            
-            if (!Array.isArray(dataPoints) || dataPoints.length === 0) {
-              console.warn(`No data points in package ${idx}`);
-              return null;
-            }
-
-            // Get the first data point (should be the selected feed)
-            const dataPoint = dataPoints[0];
-            
-            console.log(`Processing signer ${idx + 1}:`, dataPoint);
-            console.log(`Value type:`, typeof dataPoint.value);
-            console.log(`Value:`, dataPoint.value);
-            
-            // Parse the value correctly - handle Uint8Array, BigInt, Number, String
-            let parsedValue = 0;
-            
-            if (dataPoint.value instanceof Uint8Array) {
-              // Convert Uint8Array to BigInt
-              let hex = '0x';
-              for (let i = 0; i < dataPoint.value.length; i++) {
-                hex += dataPoint.value[i].toString(16).padStart(2, '0');
-              }
-              parsedValue = Number(BigInt(hex));
-              console.log(`Converted Uint8Array to hex: ${hex}, BigInt: ${BigInt(hex)}, Number: ${parsedValue}`);
-            } else if (typeof dataPoint.value === 'bigint') {
-              parsedValue = Number(dataPoint.value);
-            } else if (typeof dataPoint.value === 'number') {
-              parsedValue = dataPoint.value;
-            } else if (typeof dataPoint.value === 'string') {
-              parsedValue = parseFloat(dataPoint.value);
-            } else {
-              console.warn(`Unknown value type for signer ${idx + 1}:`, typeof dataPoint.value);
-            }
-
-            // Apply decimals if present (RedStone typically uses 8 decimals)
-            const decimals = dataPoint.decimals || 8;
-            const finalValue = parsedValue / Math.pow(10, decimals);
-
-            console.log(`Signer ${idx + 1}: Raw=${parsedValue}, Decimals=${decimals}, Final=${finalValue}`);
-
-            return {
-              id: `signer_${idx + 1}`,
-              value: finalValue,
-              timestamp: dataPackage.timestampMilliseconds,
-              signature: signedPackage.signature,
-            };
-          }).filter(Boolean); // Remove nulls
-
-          if (processedDataPoints.length === 0) {
-            throw new Error("No valid data points found");
-          }
-
-          // Calculate median
-          const values = processedDataPoints.map((dp: any) => dp.value);
-          values.sort((a, b) => a - b);
-          const median = values[Math.floor(values.length / 2)];
-
-          console.log("Processed Values:", values);
-          console.log("Median:", median);
-
-          // ✅ APPLY SCENARIO MODIFICATIONS to Real Data (for educational simulation)
-          const modifiedDataPoints = processedDataPoints.map((dp: any, idx: number) => {
-            let modifiedValue = dp.value;
-            let modifiedTimestamp = dp.timestamp;
-
-            // Apply Price Shift
-            if (scenarioParams.priceShift !== 0) {
-              modifiedValue = dp.value * (1 + scenarioParams.priceShift / 100);
-            }
-
-            // Apply Timestamp Delay
-            if (scenarioParams.timestampDelay !== 0) {
-              modifiedTimestamp = dp.timestamp - (scenarioParams.timestampDelay * 1000);
-            }
-
-            // Apply Outlier to specific signer (if configured)
-            if (scenarioParams.outlierValue !== 0 && idx === 0) {
-              modifiedValue = dp.value * (1 + scenarioParams.outlierValue / 100);
-            }
-
-            // Corrupt specific signer (if configured)
-            if (scenarioParams.corruptSigners > 0 && idx < scenarioParams.corruptSigners) {
-              modifiedValue = dp.value * 0.5; // Corrupt by making it 50% of real value
-            }
-
-            return {
-              id: dp.id,
-              value: modifiedValue,
-              timestamp: modifiedTimestamp,
-              signature: dp.signature,
-            };
-          });
-
-          // Recalculate median with modified values
-          const modifiedValues = modifiedDataPoints.map((dp: any) => dp.value);
-          modifiedValues.sort((a, b) => a - b);
-          const modifiedMedian = modifiedValues[Math.floor(modifiedValues.length / 2)];
-
-          console.log("Modified Values (after scenarios):", modifiedValues);
-          console.log("Modified Median:", modifiedMedian);
-
-          debug = {
-            dataPackage: {
-              dataPoints: modifiedDataPoints.map((dp: any) => ({
-                id: dp.id,
-                value: dp.value,
-                timestamp: dp.timestamp,
-              })),
-              signatures: modifiedDataPoints.map((dp: any) => {
-                const sig = dp.signature;
-                // Handle different signature formats
-                if (typeof sig === 'string') return sig;
-                if (sig && typeof sig === 'object' && sig.r && sig.s) {
-                  // Signature is an object with r, s, v components
-                  return `${sig.r}${sig.s}${sig.v || ''}`.substring(0, 42);
-                }
-                return "0x" + Math.random().toString(16).slice(2, 42);
-              }),
-            },
-            medianPrice: modifiedMedian, // Use modified median after scenarios
-            gasUsed: Math.floor(Math.random() * 50000) + 40000,
-            transactionHash: "0x" + Math.random().toString(16).slice(2).padEnd(64, "0"),
-            blockNumber: Math.floor(Math.random() * 10000000),
-          };
-        } catch (redstoneError) {
-          console.error("RedStone API Error:", redstoneError);
-          throw new Error(
-            `RedStone fetch failed: ${redstoneError instanceof Error ? redstoneError.message : 'Unknown error'}`
-          );
-        }
+        rawData = await fetchRealData();
       } else {
-        // ✅ MOCK DATA - For testing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        debug = {
-          dataPackage: {
-            dataPoints: [
-              {
-                id: "signer_1",
-                value: currentFeed.currentPrice * (1 + scenarioParams.priceShift / 100),
-                timestamp: Date.now() - scenarioParams.timestampDelay * 1000,
-              },
-              {
-                id: "signer_2",
-                value: currentFeed.currentPrice * (1 + (scenarioParams.priceShift + 0.2) / 100),
-                timestamp: Date.now() - scenarioParams.timestampDelay * 1000,
-              },
-              {
-                id: "signer_3",
-                value: currentFeed.currentPrice * (1 + (scenarioParams.priceShift - 0.1) / 100),
-                timestamp: Date.now() - scenarioParams.timestampDelay * 1000,
-              },
-            ],
-            signatures: [
-              "0x1234567890abcdef1234567890abcdef12345678",
-              "0xabcdef1234567890abcdef1234567890abcdef12",
-              "0x90abcdef1234567890abcdef1234567890abcdef",
-            ],
-          },
-          medianPrice: currentFeed.currentPrice * (1 + scenarioParams.priceShift / 100),
-          gasUsed: 78542,
-          transactionHash:
-            "0xdef456c6a2e4b3f8861d8f813a4059733c7a7605e45c45053644265d3a50789a",
-          blockNumber: 18950234,
-        };
+        rawData = generateMockData();
       }
 
-      setDebugData(debug);
-      setContractAddress("0x742d35Cc6635C0532925a3b8D40Ec8c2C2c3C7B1");
+      // Apply scenario modifications
+      const modifiedDataPoints = applyScenarioModifications(rawData.dataPoints, scenarioParams);
+
+      // Calculate median
+      const values = modifiedDataPoints.map((dp) => dp.value);
+      const medianPrice = calculateMedian(values);
+
+      // Generate debug data
+      const debugInfo: DebugData = {
+        dataPackage: {
+          dataPoints: modifiedDataPoints,
+          signatures: rawData.signatures,
+        },
+        medianPrice,
+        transactionHash: `0xbc${Math.random().toString(16).slice(2, 66)}`,
+        blockNumber: Math.floor(Math.random() * 1000000) + 2234644,
+        gasUsed: 75000 + Math.floor(Math.random() * 25000),
+      };
+
+      setDebugData(debugInfo);
       setSimulationState("completed");
     } catch (error) {
-      console.error("Simulation failed:", error);
-      if (error instanceof Error) {
-        console.error("Error message:", error.message);
-        console.error("Error stack:", error.stack);
-      }
+      console.error("Simulation error:", error);
       setSimulationState("error");
     }
-  }, [useRealData, selectedFeed, currentFeed, scenarioParams]);
+  };
 
-  const resetSimulation = useCallback(() => {
+  // Reset Simulation
+  const resetSimulation = () => {
     setSimulationState("idle");
     setDebugData(null);
-    setContractAddress("");
-  }, []);
+  };
+
+  const selectedFeedData = SUPPORTED_FEEDS.find((f) => f.id === selectedFeed) || SUPPORTED_FEEDS[0];
+  const contractAddress = `0x742d35Cc6635C0532${Math.random().toString(16).slice(2, 18)}`;
 
   return (
-    <div className="min-h-screen text-gray-200 flex flex-col">
-      <div className="flex-grow p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          <Header />
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-gray-100">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <Header 
+          useRealData={useRealData} 
+          setUseRealData={setUseRealData}
+          beginnerMode={beginnerMode}
+          setBeginnerMode={setBeginnerMode}
+        />
 
-          {/* Toggle Real Data */}
-          <div className="flex justify-end mb-4">
-            <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={useRealData}
-                onChange={(e) => setUseRealData(e.target.checked)}
-                className="w-4 h-4 accent-red-500"
-              />
-              Use Real Data (RedStone)
-            </label>
-          </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Configuration Panel */}
+          <ConfigurationPanel
+            selectedFeed={selectedFeed}
+            setSelectedFeed={setSelectedFeed}
+            selectedScenario={selectedScenario}
+            setSelectedScenario={handleScenarioChange}
+            scenarioParams={scenarioParams}
+            setScenarioParams={(params) => setScenarioParams({ ...scenarioParams, ...params })}
+            simulationState={simulationState}
+            runSimulation={runSimulation}
+            resetSimulation={resetSimulation}
+            beginnerMode={beginnerMode}
+          />
 
-          <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <ConfigurationPanel
-              selectedFeed={selectedFeed}
-              setSelectedFeed={setSelectedFeed}
-              selectedScenario={selectedScenario}
-              setSelectedScenario={setSelectedScenario}
-              scenarioParams={scenarioParams}
-              setScenarioParams={(params) => {
-                setScenarioParams((prev) => ({ ...prev, ...params }));
-                setSelectedScenario("custom");
-              }}
-              simulationState={simulationState}
-              runSimulation={runSimulation}
-              resetSimulation={resetSimulation}
-            />
-            <ResultsPanel
-              simulationState={simulationState}
-              debugData={debugData}
-              contractAddress={contractAddress}
-              selectedFeed={currentFeed}
-              selectedScenario={selectedScenario}
-              scenarioParams={scenarioParams}
-              useRealData={useRealData}
-            />
-          </main>
+          {/* Results Panel */}
+          <ResultsPanel
+            simulationState={simulationState}
+            debugData={debugData}
+            contractAddress={contractAddress}
+            selectedFeed={selectedFeedData}
+            selectedScenario={selectedScenario}
+            scenarioParams={scenarioParams}
+            useRealData={useRealData}
+            beginnerMode={beginnerMode}
+          />
         </div>
+
+        {/* Footer */}
+        <footer className="mt-12 text-center text-gray-500 text-sm">
+          <p>
+            Built using{" "}
+            <a
+              href="https://redstone.finance"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-400 hover:text-red-300 transition-colors"
+            >
+              RedStone Finance
+            </a>
+          </p>
+          <p className="mt-2">
+            <a
+              href="https://docs.redstone.finance"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-300 transition-colors underline"
+            >
+              Documentation
+            </a>
+            {" · "}
+            <a
+              href="https://github.com/redstone-finance"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-300 transition-colors underline"
+            >
+              GitHub
+            </a>
+            {" · "}
+            <a
+              href="https://discord.gg/redstone"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-300 transition-colors underline"
+            >
+              Discord
+            </a>
+          </p>
+        </footer>
       </div>
-      <Footer />
     </div>
   );
 }
+
+export default App;
